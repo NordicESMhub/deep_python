@@ -1,5 +1,5 @@
 ---
-title: Analyzing Patient Data
+title: Analyzing Tabular Data
 teaching: 60
 exercises: 30
 questions:
