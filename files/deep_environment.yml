@@ -1,0 +1,29 @@
+name: deeplearning
+
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - numpy 
+  - xarray 
+  - pandas
+  - cartopy
+  - matplotlib 
+  - seaborn 
+  - geopy 
+  - basemap
+  - netcdf4
+  - cis
+  - metpy
+  - scipy
+  - rasterio
+  - tqdm
+  - requests
+  - pillow
+  - branca
+  - geopandas
+  - scikit-learn
+  - pytorch
+  - torchvision
+  - notebook

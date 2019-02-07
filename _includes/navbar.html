@@ -19,6 +19,10 @@
       <a href="{{ site.swc_site }}" class="pull-left">
         <img class="navbar-logo" src="{{ relative_root_path }}{% link /assets/img/swc-icon-blue.svg %}" alt="Software Carpentry logo" />
       </a>
+      {% elsif site.carpentry == "dp" %}
+      <a href="{{ site.dp_site }}" class="pull-left">
+        <img class="navbar-logo" src="{{ relative_root_path }}{% link /assets/img/dp-icon.png %}" alt="Data Carpentry logo" />
+      </a>
       {% elsif site.carpentry == "dc" %}
       <a href="{{ site.dc_site }}" class="pull-left">
         <img class="navbar-logo" src="{{ relative_root_path }}{% link /assets/img/dc-icon-black.svg %}" alt="Data Carpentry logo" />
