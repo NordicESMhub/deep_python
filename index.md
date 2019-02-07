@@ -4,6 +4,8 @@ root: .  # Is the only page that doesn't follow the pattern /:path/index.html
 permalink: index.html  # Is the only page that doesn't follow the pattern /:path/index.html
 ---
 
+<img src="fig/deeplogo_vektor.png" alt="DEEP">
+
 The course is aimed at PhDs, postdocs and other researchers who are working on Dynamics and Evolution of Earth and Planets and are willing to learn Python. For the first 2 days you don't need to have any previous knowledge of python programming while for the last 3 days we build on the knowledge acquired during the beginning of the course towards advanced python programming.
 
 
