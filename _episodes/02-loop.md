@@ -16,12 +16,12 @@ keypoints:
 ---
 
 In the last episode,
-we wrote some code that plots some values of interest from our first inflammation dataset,
-and reveals some suspicious features in it, such as from `inflammation-01.csv`
+we wrote some code that plots some values of interest from our first temperature anomaly dataset,
+and reveals some interesting features in it, such as from `uahncdc.lt-01.csv`
 
-![Analysis of inflammation-01.csv](../fig/03-loop_2_0.png)
+![Analysis of uahncdc.lt-01.csv](../fig/03-loop_2_0.png)
 
-We have a dozen data sets right now, though, and more on the way.
+We have several data sets right now, though, and more on the way.
 We want to create plots for all of our data sets with a single statement.
 To do that, we'll have to teach the computer how to repeat things.
 
