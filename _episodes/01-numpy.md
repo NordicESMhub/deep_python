@@ -29,8 +29,59 @@ keypoints:
 - "Use the `pyplot` library from `matplotlib` for creating simple visualizations."
 ---
 
-In this episode we will learn how to work with arthritis inflammation datasets in Python. However,
-before we discuss how to deal with many data points, let's learn how to work with
+The best way to learn how to program is to do something useful,
+so this introduction to Python is built around a common scientific task:
+**data analysis**.
+
+> ## Prerequisites
+>
+> You need to understand the concepts of **files** and **directories** and how to start a Python
+> interpreter before tackling this lesson. This lesson sometimes references Jupyter
+> Notebook although you can use any Python interpreter mentioned in the [Setup](setup/).
+>
+> The commands in this lesson pertain to **Python 3**.
+{: .prereq}
+
+
+> ## Temperature anomalies in Polar regions: Arctic and Antarctic
+> In this episode we will learn how to work with datasets from [Climate4you](https://www.climate4you.com/) containing [Temperature anomalies in Polar regions](https://www.climate4you.com/Polar%20temperatures.htm#Diagram%20Antarctic%20MAAT).
+> The main objective of [Climate4you](https://www.climate4you.com/) is to provide information on meteorological and climatologically issues of general and specific interest. 
+> The dataset that has been prepared for this lesson contains [comma-separted values]({{ page.root }}/reference/#comma-separated-values) (CSV) 
+> series of [UAH MSU](https://en.wikipedia.org/wiki/UAH_satellite_temperature_dataset) global monthly lower troposphere temperature anomalies since 
+> December 1978. The reference period for computing the temperature anomalies is 1981-2010.
+>
+> - each row holds temperature anomalies for a single date (year and month), starting from December 1978.
+> - columns represents different geographical areas
+> 
+> Data were split by decade so we have several files covering the period between December 1978 to February 2019.
+>
+> The first five rows of our first file look like this:
+>
+> ~~~
+> Globe,Land,Ocean,NH,Land,Ocean,SH,Land,Ocean,Trpcs,Land,Ocean,NoExt,Land,Ocean,SoExt,Land,Ocean,NoPol,Land,Ocean,SoPol,Land,Ocean,USA48,USA49,AUST
+-0.28,-0.36,-0.24,-0.30,-0.41,-0.20,-0.26,-0.27,-0.26,-0.21,-0.22,-0.21,-0.37,-0.51,-0.20,-0.26,-0.21,-0.28,-0.61,-1.29,0.47,-0.20,-0.20,-0.21,-1.60,-1.46,-0.50
+-0.25,-0.40,-0.17,-0.47,-0.69,-0.26,-0.03,0.17,-0.10,-0.12,-0.11,-0.13,-0.67,-0.88,-0.40,0.03,0.41,-0.07,-0.45,-1.03,0.46,0.25,0.43,0.10,-3.75,-2.77,1.22
+-0.26,-0.46,-0.14,-0.42,-0.57,-0.26,-0.10,-0.24,-0.05,0.00,0.07,-0.03,-0.65,-0.82,-0.43,-0.13,-0.39,-0.06,-2.86,-3.15,-2.39,-0.31,-0.68,-0.01,-2.41,-2.48,-0.17
+-0.26,-0.34,-0.21,-0.35,-0.36,-0.34,-0.17,-0.30,-0.13,-0.10,-0.15,-0.08,-0.51,-0.46,-0.57,-0.17,-0.31,-0.13,-0.94,-1.14,-0.63,-0.41,-0.89,-0.03,-0.52,-0.34,0.32
+> ~~~
+> {: .source}
+> 
+> Data were obtained by the National Oceanographic and Atmospheric Administration (NOAA) TIROS-N satellite, 
+> interpreted by Dr. Roy Spencer and Dr. John Christy, both at Global Hydrology and Climate Center, University of Alabama at Huntsville, USA. 
+>
+> 
+> So, we want to:
+> 
+> 1. Calculate the average temperature per geographical areas across all dates. 
+> 2. Plot the result to discuss and share with colleagues.
+> 
+> To do all that, we'll have to learn a little bit about programming.
+> 
+>
+{: .callout}
+
+
+Before we discuss how to deal with many data points, let's learn how to work with
 single data values.
 
 ## Variables
@@ -203,7 +254,7 @@ specialized tools built up from these basic units live in
 that can be called upon when needed.
 
 ## Loading data into Python
-In order to load our inflammation data, we need to access
+In order to load our temperature data series, we need to access
 ([import]({{ page.root }}/reference/#import) in Python terminology) a library called
 [NumPy](http://docs.scipy.org/doc/numpy/ "NumPy Documentation").  In general you should use this
 library if you want to do fancy things with numbers, especially if you have matrices or arrays.  We
@@ -222,18 +273,24 @@ need for each program. Once we've imported the library, we can ask the library t
 file for us:
 
 ~~~
-numpy.loadtxt(fname='inflammation-01.csv', delimiter=',')
+numpy.loadtxt(fname='uahncdc.lt-01.csv', skiprows=1, delimiter=',')
 ~~~
 {: .language-python}
 
 ~~~
-array([[ 0.,  0.,  1., ...,  3.,  0.,  0.],
-       [ 0.,  1.,  2., ...,  1.,  0.,  1.],
-       [ 0.,  1.,  1., ...,  2.,  1.,  1.],
-       ...,
-       [ 0.,  1.,  1., ...,  1.,  1.,  1.],
-       [ 0.,  0.,  0., ...,  0.,  2.,  0.],
-       [ 0.,  0.,  1., ...,  1.,  1.,  0.]])
+array([[-0.28, -0.36, -0.24, -0.3 , -0.41, -0.2 , -0.26, -0.27, -0.26,
+        -0.21, -0.22, -0.21, -0.37, -0.51, -0.2 , -0.26, -0.21, -0.28,
+        -0.61, -1.29,  0.47, -0.2 , -0.2 , -0.21, -1.6 , -1.46, -0.5 ],
+       [-0.25, -0.4 , -0.17, -0.47, -0.69, -0.26, -0.03,  0.17, -0.1 ,
+        -0.12, -0.11, -0.13, -0.67, -0.88, -0.4 ,  0.03,  0.41, -0.07,
+        -0.45, -1.03,  0.46,  0.25,  0.43,  0.1 , -3.75, -2.77,  1.22],
+       [-0.26, -0.46, -0.14, -0.42, -0.57, -0.26, -0.1 , -0.24, -0.05,
+         0.  ,  0.07, -0.03, -0.65, -0.82, -0.43, -0.13, -0.39, -0.06,
+        -2.86, -3.15, -2.39, -0.31, -0.68, -0.01, -2.41, -2.48, -0.17],
+		...
+	   [ 0.02,  0.21, -0.09, -0.03,  0.12, -0.17,  0.07,  0.37, -0.03,
+        -0.02, -0.15,  0.05, -0.02,  0.23, -0.33,  0.1 ,  0.75, -0.08,
+        -1.07, -0.64, -1.74,  1.34,  1.51,  1.21,  1.66,  0.72,  0.41]])
 ~~~
 {: .output}
 
@@ -247,9 +304,10 @@ As an example, John Smith is the John that belongs to the Smith family.
 We could use the dot notation to write his name `smith.john`,
 just as `loadtxt` is a function that belongs to the `numpy` library.
 
-`numpy.loadtxt` has two [parameters]({{ page.root }}/reference/#parameter): the name of the file
-we want to read and the [delimiter]({{ page.root }}/reference/#delimiter) that separates values on
-a line. These both need to be character strings (or [strings]({{ page.root }}/reference/#string)
+`numpy.loadtxt` has three [parameters]({{ page.root }}/reference/#parameter): the name of the file
+we want to read, the number of initial rows to skip (header containing the names of each column)
+and the [delimiter]({{ page.root }}/reference/#delimiter) that separates values on
+a line. These parameters need to be character strings (or [strings]({{ page.root }}/reference/#string)
 for short), so we put them in quotes.
 
 Since we haven't told it to do anything else with the function's output,
@@ -271,7 +329,7 @@ can also assign an array of values to a variable using the same syntax.  Let's r
 `numpy.loadtxt` and save the returned data:
 
 ~~~
-data = numpy.loadtxt(fname='inflammation-01.csv', delimiter=',')
+data = numpy.loadtxt(fname='uahncdc.lt-01.csv', skiprows=1, delimiter=',')
 ~~~
 {: .language-python}
 
@@ -285,13 +343,19 @@ print(data)
 {: .language-python}
 
 ~~~
-[[ 0.  0.  1. ...,  3.  0.  0.]
- [ 0.  1.  2. ...,  1.  0.  1.]
- [ 0.  1.  1. ...,  2.  1.  1.]
- ...,
- [ 0.  1.  1. ...,  1.  1.  1.]
- [ 0.  0.  0. ...,  0.  2.  0.]
- [ 0.  0.  1. ...,  1.  1.  0.]]
+[[-0.28, -0.36, -0.24, -0.3 , -0.41, -0.2 , -0.26, -0.27, -0.26,
+        -0.21, -0.22, -0.21, -0.37, -0.51, -0.2 , -0.26, -0.21, -0.28,
+        -0.61, -1.29,  0.47, -0.2 , -0.2 , -0.21, -1.6 , -1.46, -0.5 ],
+       [-0.25, -0.4 , -0.17, -0.47, -0.69, -0.26, -0.03,  0.17, -0.1 ,
+        -0.12, -0.11, -0.13, -0.67, -0.88, -0.4 ,  0.03,  0.41, -0.07,
+        -0.45, -1.03,  0.46,  0.25,  0.43,  0.1 , -3.75, -2.77,  1.22],
+       [-0.26, -0.46, -0.14, -0.42, -0.57, -0.26, -0.1 , -0.24, -0.05,
+         0.  ,  0.07, -0.03, -0.65, -0.82, -0.43, -0.13, -0.39, -0.06,
+        -2.86, -3.15, -2.39, -0.31, -0.68, -0.01, -2.41, -2.48, -0.17],
+		...
+	   [ 0.02,  0.21, -0.09, -0.03,  0.12, -0.17,  0.07,  0.37, -0.03,
+        -0.02, -0.15,  0.05, -0.02,  0.23, -0.33,  0.1 ,  0.75, -0.08,
+        -1.07, -0.64, -1.74,  1.34,  1.51,  1.21,  1.66,  0.72,  0.41]]
 ~~~
 {: .output}
 
@@ -312,9 +376,9 @@ print(type(data))
 
 The output tells us that `data` currently refers to
 an N-dimensional array, the functionality for which is provided by the NumPy library.
-These data correspond to arthritis patients' inflammation.
-The rows are the individual patients, and the columns
-are their daily inflammation measurements.
+These data correspond to temperature anomalies (degree Celcius) over various geographical regions.
+The rows are measurements at different dates, and the columns
+are their corresponding temperature anomalies.
 
 > ## Data Type
 >
@@ -347,12 +411,12 @@ print(data.shape)
 {: .language-python}
 
 ~~~
-(60, 40)
+(13, 27)
 ~~~
 {: .output}
 
-The output tells us that the `data` array variable contains 60 rows and 40 columns. When we
-created the variable `data` to store our arthritis data, we didn't just create the array; we also
+The output tells us that the `data` array variable contains 13 rows and 27 columns. When we
+created the variable `data` to store our data, we didn't just create the array; we also
 created information about the array, called [members]({{ page.root }}/reference/#member) or
 attributes. This extra information describes `data` in the same way an adjective describes a noun.
 `data.shape` is an attribute of `data` which describes the dimensions of `data`. We use the same
@@ -361,7 +425,7 @@ they have the same part-and-whole relationship.
 
 If we want to get a single number from the array, we must provide an
 [index]({{ page.root }}/reference/#index) in square brackets after the variable name, just as we
-do in math when referring to an element of a matrix.  Our inflammation data has two dimensions, so
+do in math when referring to an element of a matrix.  Our data has two dimensions, so
 we will need to use two indices to refer to one specific value:
 
 ~~~
@@ -370,21 +434,22 @@ print('first value in data:', data[0, 0])
 {: .language-python}
 
 ~~~
-first value in data: 0.0
+first value in data: -0.28
 ~~~
 {: .output}
 
 ~~~
-print('middle value in data:', data[30, 20])
+print('middle value in data:', data[6, 14])
 ~~~
 {: .language-python}
 
 ~~~
-middle value in data: 13.0
+middle value in data: -0.32
 ~~~
 {: .output}
 
-The expression `data[30, 20]` accesses the element at row 30, column 20. While this expression may
+The expression `data[6, 14]` accesses the element at row 6, column 14. While this expression may
+The expression `data[6, 14]` accesses the element at row 6, column 14. While this expression may
 not surprise you,
  `data[0, 0]` might.
 Programming languages like Fortran, MATLAB and R start counting at 1
@@ -416,8 +481,9 @@ the index is how many steps we have to take from the start to get the item we wa
 > which can be confusing when plotting data.
 {: .callout}
 
+
 ## Slicing data
-An index like `[30, 20]` selects a single element of an array,
+An index like `[6, 14]` selects a single element of an array,
 but we can select whole sections as well.
 For example,
 we can select the first ten days (columns) of values
@@ -429,15 +495,15 @@ print(data[0:4, 0:10])
 {: .language-python}
 
 ~~~
-[[ 0.  0.  1.  3.  1.  2.  4.  7.  8.  3.]
- [ 0.  1.  2.  1.  2.  1.  3.  2.  2.  6.]
- [ 0.  1.  1.  3.  3.  2.  6.  2.  5.  9.]
- [ 0.  0.  2.  0.  4.  2.  2.  1.  6.  7.]]
+[[-0.28 -0.36 -0.24 -0.3  -0.41 -0.2  -0.26 -0.27 -0.26 -0.21]
+ [-0.25 -0.4  -0.17 -0.47 -0.69 -0.26 -0.03  0.17 -0.1  -0.12]
+ [-0.26 -0.46 -0.14 -0.42 -0.57 -0.26 -0.1  -0.24 -0.05  0.  ]
+ [-0.26 -0.34 -0.21 -0.35 -0.36 -0.34 -0.17 -0.3  -0.13 -0.1 ]]
 ~~~
 {: .output}
 
 The [slice]({{ page.root }}/reference/#slice) `0:4` means, "Start at index 0 and go up to, but not
-including, index 4."Again, the up-to-but-not-including takes a bit of getting used to, but the
+including, index 4". Again, the up-to-but-not-including takes a bit of getting used to, but the
 rule is that the difference between the upper and lower bounds is the number of values in the slice.
 
 We don't have to start slices at 0:
@@ -448,11 +514,11 @@ print(data[5:10, 0:10])
 {: .language-python}
 
 ~~~
-[[ 0.  0.  1.  2.  2.  4.  2.  1.  6.  4.]
- [ 0.  0.  2.  2.  4.  2.  2.  5.  5.  8.]
- [ 0.  0.  1.  2.  3.  1.  2.  3.  5.  3.]
- [ 0.  0.  0.  3.  1.  5.  6.  5.  5.  8.]
- [ 0.  1.  1.  2.  1.  3.  5.  3.  5.  8.]]
+[[-0.25 -0.35 -0.19 -0.38 -0.37 -0.38 -0.11 -0.29 -0.05 -0.12]
+ [-0.2  -0.26 -0.17 -0.26 -0.29 -0.22 -0.15 -0.19 -0.14 -0.06]
+ [-0.12 -0.28 -0.03 -0.   -0.16  0.15 -0.24 -0.51 -0.15  0.  ]
+ [-0.24 -0.34 -0.18 -0.19 -0.29 -0.09 -0.29 -0.42 -0.24 -0.01]
+ [-0.1  -0.16 -0.06 -0.14 -0.14 -0.15 -0.06 -0.21 -0.    0.03]]
 ~~~
 {: .output}
 
@@ -462,18 +528,18 @@ axis, and if we don't include either (i.e., if we just use ':' on its own), the 
 everything:
 
 ~~~
-small = data[:3, 36:]
+small = data[:3, 20:]
 print('small is:')
 print(small)
 ~~~
 {: .language-python}
-The above example selects rows 0 through 2 and columns 36 through to the end of the array.
+The above example selects rows 0 through 2 and columns 20 through to the end of the array.
 
 ~~~
 small is:
-[[ 2.  3.  0.  0.]
- [ 1.  1.  0.  1.]
- [ 2.  2.  1.  1.]]
+[[ 0.47 -0.2  -0.2  -0.21 -1.6  -1.46 -0.5 ]
+ [ 0.46  0.25  0.43  0.1  -3.75 -2.77  1.22]
+ [-2.39 -0.31 -0.68 -0.01 -2.41 -2.48 -0.17]]
 ~~~
 {: .output}
 
@@ -491,21 +557,21 @@ each element of which is twice the value of the corresponding element in `data`:
 
 ~~~
 print('original:')
-print(data[:3, 36:])
+print(data[:3, 20:])
 print('doubledata:')
-print(doubledata[:3, 36:])
+print(doubledata[:3, 20:])
 ~~~
 {: .language-python}
 
 ~~~
 original:
-[[ 2.  3.  0.  0.]
- [ 1.  1.  0.  1.]
- [ 2.  2.  1.  1.]]
+[[ 0.47 -0.2  -0.2  -0.21 -1.6  -1.46 -0.5 ]
+ [ 0.46  0.25  0.43  0.1  -3.75 -2.77  1.22]
+ [-2.39 -0.31 -0.68 -0.01 -2.41 -2.48 -0.17]]
 doubledata:
-[[ 4.  6.  0.  0.]
- [ 2.  2.  0.  2.]
- [ 4.  4.  2.  2.]]
+[[ 0.94 -0.4  -0.4  -0.42 -3.2  -2.92 -1.  ]
+ [ 0.92  0.5   0.86  0.2  -7.5  -5.54  2.44]
+ [-4.78 -0.62 -1.36 -0.02 -4.82 -4.96 -0.34]]
 ~~~
 {: .output}
 
@@ -523,21 +589,21 @@ and so on for all other elements of the arrays.
 
 ~~~
 print('tripledata:')
-print(tripledata[:3, 36:])
+print(tripledata[:3, 20:])
 ~~~
 {: .language-python}
 
 ~~~
 tripledata:
-[[ 6.  9.  0.  0.]
- [ 3.  3.  0.  3.]
- [ 6.  6.  3.  3.]]
+[[  1.41  -0.6   -0.6   -0.63  -4.8   -4.38  -1.5 ]
+ [  1.38   0.75   1.29   0.3  -11.25  -8.31   3.66]
+ [ -7.17  -0.93  -2.04  -0.03  -7.23  -7.44  -0.51]]
 ~~~
 {: .output}
 
 Often, we want to do more than add, subtract, multiply, and divide array elements.  NumPy knows how
-to do more complex operations, too.  If we want to find the average inflammation for all patients on
-all days, for example, we can ask NumPy to compute `data`'s mean value:
+to do more complex operations, too.  If we want to find the average temperature anomalies for all dates on
+all geographical regions, for example, we can ask NumPy to compute `data`'s mean value:
 
 ~~~
 print(numpy.mean(data))
@@ -545,7 +611,7 @@ print(numpy.mean(data))
 {: .language-python}
 
 ~~~
-6.14875
+-0.28806267806267805
 ~~~
 {: .output}
 
@@ -583,8 +649,8 @@ a convenient Python feature that will enable us to do this all in one line.
 ~~~
 maxval, minval, stdval = numpy.max(data), numpy.min(data), numpy.std(data)
 
-print('maximum inflammation:', maxval)
-print('minimum inflammation:', minval)
+print('maximum temperature anomaly:', maxval)
+print('minimum temperature anomaly:', minval)
 print('standard deviation:', stdval)
 ~~~
 {: .language-python}
@@ -593,9 +659,9 @@ Here we've assigned the return value from `numpy.max(data)` to the variable `max
 from `numpy.min(data)` to `minval`, and so on.
 
 ~~~
-maximum inflammation: 20.0
-minimum inflammation: 0.0
-standard deviation: 4.61383319712
+maximum temperature anomaly: 1.66
+minimum temperature anomaly: -3.75
+standard deviation: 0.5596297173782723
 ~~~
 {: .output}
 
@@ -612,19 +678,19 @@ standard deviation: 4.61383319712
 
 When analyzing data, though,
 we often want to look at variations in statistical values,
-such as the maximum inflammation per patient
-or the average inflammation per day.
+such as the maximum monthly temperature anomaly per date 
+or the average temperature anomaly per geographical region.
 One way to do this is to create a new temporary array of the data we want,
 then ask it to do the calculation:
 
 ~~~
-patient_0 = data[0, :] # 0 on the first axis (rows), everything on the second (columns)
-print('maximum inflammation for patient 0:', numpy.max(patient_0))
+T_197812 = data[0, :] # 0 on the first axis (rows), everything on the second (columns)
+print('maximum monthly temperature anomaly in December 1978:', numpy.max(T_197812))
 ~~~
 {: .language-python}
 
 ~~~
-maximum inflammation for patient 0: 18.0
+maximum monthly temperature anomaly in December 1978: 0.47
 ~~~
 {: .output}
 
@@ -637,17 +703,17 @@ We don't actually need to store the row in a variable of its own.
 Instead, we can combine the selection and the function call:
 
 ~~~
-print('maximum inflammation for patient 2:', numpy.max(data[2, :]))
+print('maximum monthly temperature anomaly in February 1979:', numpy.max(data[2, :]))
 ~~~
 {: .language-python}
 
 ~~~
-maximum inflammation for patient 2: 19.0
+maximum monthly temperature anomaly in February 1979: 0.07
 ~~~
 {: .output}
 
-What if we need the maximum inflammation for each patient over all days (as in the
-next diagram on the left) or the average for each day (as in the
+What if we need the maximum monthly anomaly for each date over all geographical areas (as in the
+next diagram on the left) or the average for each geographical area (as in the
 diagram on the right)? As the diagram below shows, we want to perform the
 operation across an axis:
 
@@ -664,14 +730,12 @@ print(numpy.mean(data, axis=0))
 {: .language-python}
 
 ~~~
-[  0.           0.45         1.11666667   1.75         2.43333333   3.15
-   3.8          3.88333333   5.23333333   5.51666667   5.95         5.9
-   8.35         7.73333333   8.36666667   9.5          9.58333333
-  10.63333333  11.56666667  12.35        13.25        11.96666667
-  11.03333333  10.16666667  10.           8.66666667   9.15         7.25
-   7.33333333   6.58333333   6.06666667   5.95         5.11666667   3.6
-   3.3          3.56666667   2.48333333   1.5          1.13333333
-   0.56666667]
+
+[-0.17846154 -0.25769231 -0.13307692 -0.23692308 -0.30846154 -0.16615385
+ -0.12076923 -0.15846154 -0.10769231 -0.02461538 -0.04230769 -0.01615385
+ -0.35153846 -0.40846154 -0.28153846 -0.16461538 -0.21846154 -0.15076923
+ -0.78615385 -0.87461538 -0.64692308 -0.20769231 -0.30538462 -0.12846154
+ -0.75076923 -0.59461538 -0.15692308]
 ~~~
 {: .output}
 
@@ -684,12 +748,12 @@ print(numpy.mean(data, axis=0).shape)
 {: .language-python}
 
 ~~~
-(40,)
+(27,)
 ~~~
 {: .output}
 
-The expression `(40,)` tells us we have an N×1 vector,
-so this is the average inflammation per day for all patients.
+The expression `(27,)` tells us we have an N×1 vector,
+so this is the average monthly temperature anomaly per geographical region for all dates.
 If we average across axis 1 (columns in our 2D example), we get:
 
 ~~~
@@ -698,16 +762,13 @@ print(numpy.mean(data, axis=1))
 {: .language-python}
 
 ~~~
-[ 5.45   5.425  6.1    5.9    5.55   6.225  5.975  6.65   6.625  6.525
-  6.775  5.8    6.225  5.75   5.225  6.3    6.55   5.7    5.85   6.55
-  5.775  5.825  6.175  6.1    5.8    6.425  6.05   6.025  6.175  6.55
-  6.175  6.35   6.725  6.125  7.075  5.725  5.925  6.15   6.075  5.75
-  5.975  5.725  6.3    5.9    6.75   5.925  7.225  6.15   5.95   6.275  5.7
-  6.1    6.825  5.975  6.725  5.7    6.25   6.4    7.05   5.9  ]
+[-0.39444444 -0.35851852 -0.71851852 -0.35259259 -0.36481481 -0.37185185
+ -0.36777778 -0.2637037  -0.37555556 -0.05703704 -0.04962963 -0.23333333
+  0.16296296]
 ~~~
 {: .output}
 
-which is the average inflammation per patient across all days.
+which is the average temperature anomaly per date across all geographical regions.
 
 ## Visualizing data
 The mathematician Richard Hamming once said, "The purpose of computing is insight, not numbers," and
@@ -727,7 +788,7 @@ matplotlib.pyplot.show()
 ![Heatmap of the Data](../fig/01-numpy_71_0.png)
 
 Blue pixels in this heat map represent low values, while yellow pixels represent high values.  As we
-can see, inflammation rises and falls over a 40-day period.
+can see, temperature anomalies vary significantly depending on the geographical area.
 
 > ## Some IPython Magic
 >
@@ -746,21 +807,20 @@ can see, inflammation rises and falls over a 40-day period.
 > Note that you only have to execute this function once per notebook.
 {: .callout}
 
-Let's take a look at the average inflammation over time:
+Let's take a look at the average temperature over each geographical area:
 
 ~~~
-ave_inflammation = numpy.mean(data, axis=0)
-ave_plot = matplotlib.pyplot.plot(ave_inflammation)
+ave_temp = numpy.mean(data, axis=0)
+ave_plot = matplotlib.pyplot.plot(ave_temp)
 matplotlib.pyplot.show()
 ~~~
 {: .language-python}
 
-![Average Inflammation Over Time](../fig/01-numpy_73_0.png)
+![Average temperature Over each geographical area](../fig/01-numpy_73_0.png)
 
-Here, we have put the average per day across all patients in the variable `ave_inflammation`, then
+Here, we have put the average per geographical area across all dates in the variable `ave_temp`, then
 asked `matplotlib.pyplot` to create and display a line graph of those values.  The result is a
-roughly linear rise and fall, which is suspicious: we might instead expect a sharper rise and slower
-fall.  Let's have a look at two other statistics:
+shows that significant changes appear in the poles, USA and Australia.  Let's have a look at two other statistics:
 
 ~~~
 max_plot = matplotlib.pyplot.plot(numpy.max(data, axis=0))
@@ -778,9 +838,9 @@ matplotlib.pyplot.show()
 
 ![Minimum Value Along The First Axis](../fig/01-numpy_75_3.png)
 
-The maximum value rises and falls smoothly, while the minimum seems to be a step function.  Neither
-trend seems particularly likely, so either there's a mistake in our calculations or something is
-wrong with our data.  This insight would have been difficult to reach by examining the numbers
+The maximum value is stable and increases quickly, while the minimum is stable and decreases significantly.  The first values for
+both the minimum and maximum concern the entire globe so we can say that for this period the global temperature anomaly is not
+significant while for some areas there are strong variations. This insight would have been difficult to reach by examining the numbers
 themselves without visualization tools.
 
 ### Grouping plots
@@ -800,7 +860,7 @@ Here are our three plots side by side:
 import numpy
 import matplotlib.pyplot
 
-data = numpy.loadtxt(fname='inflammation-01.csv', delimiter=',')
+data = numpy.loadtxt(fname='../data/uahncdc.lt-01.csv', skiprows=1, delimiter=',')
 
 fig = matplotlib.pyplot.figure(figsize=(10.0, 3.0))
 
@@ -809,13 +869,13 @@ axes2 = fig.add_subplot(1, 3, 2)
 axes3 = fig.add_subplot(1, 3, 3)
 
 axes1.set_ylabel('average')
-axes1.plot(numpy.mean(data, axis=0))
+axes1.plot(numpy.mean(data, axis=0), marker =  'o', linestyle ='-')
 
 axes2.set_ylabel('max')
-axes2.plot(numpy.max(data, axis=0))
+axes2.plot(numpy.max(data, axis=0), marker =  'o', linestyle ='-')
 
 axes3.set_ylabel('min')
-axes3.plot(numpy.min(data, axis=0))
+axes3.plot(numpy.min(data, axis=0), marker =  'o', linestyle ='-')
 
 fig.tight_layout()
 
@@ -980,7 +1040,7 @@ the graphs will actually be squeezed together more closely.)
 > > # One method
 > > axes3.set_ylabel('min')
 > > axes3.plot(numpy.min(data, axis=0))
-> > axes3.set_ylim(0,6)
+> > axes3.set_ylim(-4,0)
 > > ~~~
 > > {: .language-python}
 > {: .solution}
@@ -990,8 +1050,8 @@ the graphs will actually be squeezed together more closely.)
 > > # A more automated approach
 > > min_data = numpy.min(data, axis=0)
 > > axes3.set_ylabel('min')
-> > axes3.plot(min_data)
-> > axes3.set_ylim(numpy.min(min_data), numpy.max(min_data) * 1.1)
+> > axes3.plot(min_data, marker =  'o', linestyle ='-')
+> > axes3.set_ylim(numpy.min(min_data)*1.1, numpy.max(min_data) * 0.1)
 > > ~~~
 > > {: .language-python}
 > {: .solution}
@@ -1012,7 +1072,7 @@ the graphs will actually be squeezed together more closely.)
 > > import numpy
 > > import matplotlib.pyplot
 > >
-> > data = numpy.loadtxt(fname='inflammation-01.csv', delimiter=',')
+> > data = numpy.loadtxt(fname='../data/uahncdc.lt-01.csv', skiprows=1, delimiter=',')
 > >
 > > fig = matplotlib.pyplot.figure(figsize=(10.0, 3.0))
 > >
@@ -1041,11 +1101,11 @@ the graphs will actually be squeezed together more closely.)
 > ## Make Your Own Plot
 >
 > Create a plot showing the standard deviation (`numpy.std`)
-> of the inflammation data for each day across all patients.
+> of the temperature anomaly data for each geographical region across all dates.
 >
 > > ## Solution
 > > ~~~
-> > std_plot = matplotlib.pyplot.plot(numpy.std(data, axis=0))
+> > std_plot = matplotlib.pyplot.plot(numpy.std(data, axis=0),  marker =  'o', linestyle ='-')
 > > matplotlib.pyplot.show()
 > > ~~~
 > > {: .language-python}
@@ -1062,10 +1122,10 @@ the graphs will actually be squeezed together more closely.)
 > > import numpy
 > > import matplotlib.pyplot
 > >
-> > data = numpy.loadtxt(fname='inflammation-01.csv', delimiter=',')
+> > data = numpy.loadtxt(fname='../data/uahncdc.lt-01.csv', skiprows=1, delimiter=',')
 > >
 > > # change figsize (swap width and height)
-> > fig = matplotlib.pyplot.figure(figsize=(3.0, 10.0))
+> > fig = matplotlib.pyplot.figure(figsize=(13.0, 10.0))
 > >
 > > # change add_subplot (swap first two parameters)
 > > axes1 = fig.add_subplot(3, 1, 1)
@@ -1181,11 +1241,11 @@ the graphs will actually be squeezed together more closely.)
 > {: .solution}
 {: .challenge}
 
-> ## Change In Inflammation
+> ## Change In Temperature anomalies
 >
-> This patient data is _longitudinal_ in the sense that each row represents a
-> series of observations relating to one individual.  This means that
-> the change in inflammation over time is a meaningful concept.
+> Each row of the dataset represents a
+> series of observations relating to one geographical region.  This means that
+> the change for each geographical area in temperature anomaly over time is a meaningful concept.
 >
 > The `numpy.diff()` function takes a NumPy array and returns the
 > differences between two successive values along a specified axis.  For
@@ -1217,49 +1277,48 @@ the graphs will actually be squeezed together more closely.)
 > Which axis would it make sense to use this function along?
 >
 > > ## Solution
-> > Since the row axis (0) is patients, it does not make sense to get the
-> > difference between two arbitrary patients. The column axis (1) is in
-> > days, so the difference is the change in inflammation -- a meaningful
-> > concept.
+> > Since the row axis (0) is time, it makes sense to get the
+> > difference between two arbitrary dates. 
 > >
 > > ~~~
-> > numpy.diff(data, axis=1)
+> > numpy.diff(data, axis=0)
 > > ~~~
 > > {: .language-python}
+> > 
+> > The column axis (1) corresponds
+> > to different geographical areas so it can also be meaningful to compute the difference between two areas.
 > {: .solution}
 >
-> If the shape of an individual data file is `(60, 40)` (60 rows and 40
+> 
+> If the shape of an individual data file is `(13, 27)` (13 rows and 27
 > columns), what would the shape of the array be after you run the `diff()`
 > function and why?
 >
 > > ## Solution
-> > The shape will be `(60, 39)` because there is one fewer difference between
+> > The shape will be `(12, 27)` because there is one fewer difference between
 > > columns than there are columns in the data.
 > {: .solution}
 >
-> How would you find the largest change in inflammation for each patient? Does
-> it matter if the change in inflammation is an increase or a decrease?
+> How would you find the largest change in temperature anomaly for each geographical area? Does
+> it matter if the change in temperature anomaly is an increase or a decrease?
 >
 > > ## Solution
 > > By using the `numpy.max()` function after you apply the `numpy.diff()`
 > > function, you will get the largest difference between days.
 > >
 > > ~~~
-> > numpy.max(numpy.diff(data, axis=1), axis=1)
+> > numpy.max(numpy.diff(data, axis=0), axis=0)
 > > ~~~
 > > {: .language-python}
 > >
 > > ~~~
-> > array([  7.,  12.,  11.,  10.,  11.,  13.,  10.,   8.,  10.,  10.,   7.,
-> >          7.,  13.,   7.,  10.,  10.,   8.,  10.,   9.,  10.,  13.,   7.,
-> >         12.,   9.,  12.,  11.,  10.,  10.,   7.,  10.,  11.,  10.,   8.,
-> >         11.,  12.,  10.,   9.,  10.,  13.,  10.,   7.,   7.,  10.,  13.,
-> >         12.,   8.,   8.,  10.,  10.,   9.,   8.,  13.,  10.,   7.,  10.,
-> >          8.,  12.,  10.,   7.,  12.])
+> > array([0.14, 0.32, 0.14, 0.26, 0.28, 0.37, 0.23, 0.44, 0.24, 0.12, 0.18,
+> >      0.12, 0.29, 0.51, 0.56, 0.39, 0.83, 0.3 , 1.92, 2.01, 1.76, 1.42,
+> >      1.57, 1.36, 2.94, 2.14, 1.72])
 > > ~~~
 > > {: .language-python}
 > >
-> > If inflammation values *decrease* along an axis, then the difference from
+> > If temperature anomaly values *decrease* along an axis, then the difference from
 > > one element to the next will be negative. If
 > > you are interested in the **magnitude** of the change and not the
 > > direction, the `numpy.absolute()` function will provide that.
@@ -1268,17 +1327,14 @@ the graphs will actually be squeezed together more closely.)
 > > between readings.
 > >
 > > ~~~
-> > numpy.max(numpy.absolute(numpy.diff(data, axis=1)), axis=1)
+> > numpy.max(numpy.absolute(numpy.diff(data, axis=0)), axis=0)
 > > ~~~
 > > {: .language-python}
 > >
 > > ~~~
-> > array([ 12.,  14.,  11.,  13.,  11.,  13.,  10.,  12.,  10.,  10.,  10.,
-> >         12.,  13.,  10.,  11.,  10.,  12.,  13.,   9.,  10.,  13.,   9.,
-> >         12.,   9.,  12.,  11.,  10.,  13.,   9.,  13.,  11.,  11.,   8.,
-> >         11.,  12.,  13.,   9.,  10.,  13.,  11.,  11.,  13.,  11.,  13.,
-> >         13.,  10.,   9.,  10.,  10.,   9.,   9.,  13.,  10.,   9.,  10.,
-> >         11.,  13.,  10.,  10.,  12.])
+> > array([0.14, 0.32, 0.18, 0.26, 0.28, 0.37, 0.23, 0.44, 0.24, 0.22, 0.27,
+> >      0.18, 0.3 , 0.51, 0.56, 0.39, 0.83, 0.46, 2.41, 2.12, 2.85, 1.42,
+> >      1.57, 1.36, 2.94, 2.14, 1.72])
 > > ~~~
 > > {: .language-python}
 > >
