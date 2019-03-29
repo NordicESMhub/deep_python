@@ -9,12 +9,14 @@ title: Setup
   In addition, you will need an up-to-date web browser.
   You will need a PC with 64-bit CPU, since several packages we will be using are only available for 64-bit.
   To check this, open a bash shell, type 
+  </p>
   
   ~~~
   uname -m
   ~~~
   {: .language-bash}
   
+ <p> 
   If your system is 64-bit the answer should be `x86_64`. 
 </p>
 <p>
