@@ -9,6 +9,6 @@ questions:
 - "How to publish jupyter notebooks?"
 ---
 
-# Write anything 
+# Create some animation
 
 {% include links.md %}
