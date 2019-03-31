@@ -50,7 +50,7 @@ Let's test those functions on the dataset provided by Isabel
 
 
 ```python
-path = 'C:/Users/yellow_chocobo/Desktop/python_class/data/Isabel/'
+path = '../data/Isabel/'
 filename = 'Edmundson_data_python_DEEP.xlsx'
 
 # let's load the data with the help of the pandas function
@@ -253,7 +253,7 @@ import matplotlib.image as mpimg #if only interested in a specific function in t
 
 
 ```python
-image = 'C:/Users/yellow_chocobo/Desktop/python_class/python_small_lessons/images/mars.png'
+image = '../data/mars.png'
 
 img = mpimg.imread(image)
 
@@ -493,11 +493,6 @@ cbar = fig.colorbar(im, cax=cb_ax)
 fig.tight_layout()
 
 ```
-
-    C:\Users\yellow_chocobo\Anaconda3\lib\site-packages\matplotlib\figure.py:2299: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
-      warnings.warn("This figure includes Axes that are not compatible "
-
-
 
 ![png](../fig/output_37_1.png)
 
@@ -752,7 +747,7 @@ plt.axis('equal')
 
 ```python
 # let's load a new example
-path = 'C:/Users/yellow_chocobo/Desktop/python_class/data/Nils/'
+path = '../data/Nils/'
 filename = 'crater0000.asc'
 
 # let's load the data with the help of numpy
