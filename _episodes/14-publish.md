@@ -20,6 +20,7 @@ questions:
 
 # Create an interactive map with folium
 
+- Documentation at [https://python-visualization.github.io/folium/quickstart.html](https://python-visualization.github.io/folium/quickstart.html
 - you need to give the coordinates (latitude, longitude) in degrees of the centre of your map
 - you can choose the initial zoom level for the map by setting `zoom_start` (between 0 to 18)
 - The default `tiles` is OpenStreetMap but you can customize it using `tiles`argument. The following tilesets are built-in to Folium. Pass any of the following to the “tiles” keyword:
