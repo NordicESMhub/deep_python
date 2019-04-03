@@ -24,6 +24,4 @@ dependencies:
   - branca
   - geopandas
   - scikit-learn
-  - pytorch
-  - torchvision
   - notebook
