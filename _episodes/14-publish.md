@@ -15,6 +15,11 @@ questions:
 
 # Interactive plot in the Jupyter notebooks
 
+- [Interactive plot](https://annefou.github.io/jupyter_dashboards/)
+
 # Publish your notebook (mybinder)
+
+- [publish your notebook using github](https://annefou.github.io/jupyter_dashboards/05-sharing-github/index.html)
+- [publish your notebook using binder](https://annefou.github.io/jupyter_dashboards/06-sharing-binder/index.html)
 
 {% include links.md %}
