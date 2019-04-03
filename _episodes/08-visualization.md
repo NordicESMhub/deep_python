@@ -838,6 +838,10 @@ ax = fig.add_subplot(111, projection='3d')
 ax.contour(xc[:500], yc[:500], topography_crater[:500])
 ```
 
+# Seaborn
+
+- [Matplotlib and Seaborn](https://github.com/paris-saclay-cds/python-workshop/blob/master/Day_1_Scientific_Python/03-matplotib_seaborn.ipynb)
+
 # How to create maps with python? (advanced part)
 
 - [Geospatial Data Visualization](https://geohackweek.github.io/visualization/)
