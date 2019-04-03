@@ -840,6 +840,8 @@ ax.contour(xc[:500], yc[:500], topography_crater[:500])
 
 # How to create maps with python? (advanced part)
 
-# How to change map projection? (advanced part)
+- [Geospatial Data Visualization](https://geohackweek.github.io/visualization/)
+- [Working with Spatio-temporal data in Python](https://annefou.github.io/metos_python/)
+
 
 {% include links.md %}
