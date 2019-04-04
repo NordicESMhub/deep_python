@@ -583,6 +583,14 @@ fig = go.Figure(data=data_to_plot, layout=layout)
 py.iplot(fig)
 ```
 
+## Save your interactive plot in HTML file
+
+~~~
+py.plot(fig, filename = 'plotly_example.html', auto_open=False)
+~~~
+{: .language-python}
+
+<iframe width="1000" height="400" src="../files/plotly_example.html" frameborder="0" allowfullscreen></iframe>
 
 
 
