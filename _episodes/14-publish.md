@@ -54,7 +54,8 @@ map
 # Custom tileset
 
 - You need to give the tileset url (`tiles`) and attributes (`attr`).
-- See https://leaflet-extras.github.io/leaflet-providers/preview/
+- See [https://leaflet-extras.github.io/leaflet-providers/preview/](https://leaflet-extras.github.io/leaflet-providers/preview/)
+- See [https://mapbox.github.io/mapbox-gl-native/macos/0.5.0/tile-url-templates.html](https://mapbox.github.io/mapbox-gl-native/macos/0.5.0/tile-url-templates.html) for information on Tile url templates.
 
 
 ```python
