@@ -54,6 +54,9 @@ df
 
 ```python
 df.z.plot.contourf()
+```
+
+```python
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 ax = plt.axes(projection=ccrs.PlateCarree(central_longitude=180))
@@ -70,6 +73,19 @@ ax.gridlines()
 
 ![png](../fig/xarray_4_1.png)
 
+
+### Create a pseudocolor plot with pcolormesh
+
+```python
+import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
+ax = plt.axes(projection=ccrs.PlateCarree(central_longitude=180))
+df.z.plot.pcolormesh(ax=ax,
+                   transform=ccrs.PlateCarree())
+ax.set_title(df.title)
+ax.coastlines()
+ax.gridlines()
+```
 
 
 ```python
