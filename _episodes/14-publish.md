@@ -433,6 +433,158 @@ for lat, lon in zip(latlons['lat'],latlons['lon']):
 map
 ```
 
+# Interactive plots with Plotly
+
+
+
+```python
+import pandas as pd
+import numpy as np
+```
+
+## Read input data
+
+
+```python
+filename = "data/Isabel/Edmundson_data_python_DEEP.xlsx"
+frame = pd.read_excel(filename)
+
+frame.head()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Area</th>
+      <th>Overburden</th>
+      <th>HC_column</th>
+      <th>Trap_height</th>
+      <th>Trap_fill_%</th>
+      <th>Trap_fill_normalised_%</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>1281</td>
+      <td>89</td>
+      <td>153</td>
+      <td>58</td>
+      <td>58</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>2292</td>
+      <td>151</td>
+      <td>160</td>
+      <td>94</td>
+      <td>94</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>2806</td>
+      <td>77</td>
+      <td>320</td>
+      <td>24</td>
+      <td>24</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>1278</td>
+      <td>18</td>
+      <td>18</td>
+      <td>100</td>
+      <td>100</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>1281</td>
+      <td>40</td>
+      <td>40</td>
+      <td>100</td>
+      <td>100</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+## Use plotly offline to be able to save and use your plots offline
+
+
+```python
+import plotly.offline as py
+import plotly.graph_objs as go
+```
+
+## To initialize plotly for notebook usage
+
+
+```python
+py.init_notebook_mode()
+```
+
+## Simple scatter plot with plotly
+
+
+```python
+data_to_plot = [go.Scatter(x=frame.index, y=frame["HC_column"])]
+py.iplot(data_to_plot)
+```
+
+
+## Add title and x-axis and y-axis labels
+
+
+```python
+# To add a title, etc.
+layout = go.Layout(
+    title='Test ',
+    xaxis=dict(
+        title='index',
+        titlefont=dict(
+            size=18,
+            color='#7f7f7f'
+        )
+    ),
+    yaxis=dict(
+        title='HC_column',
+        titlefont=dict(
+            size=18,
+            color='#7f7f7f'
+        )
+    )
+)
+fig = go.Figure(data=data_to_plot, layout=layout)
+py.iplot(fig)
+```
+
+
+
 
 # Publish your notebook (mybinder)
 
