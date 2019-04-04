@@ -1,9 +1,10 @@
 ---
-title: Interfacing Fortran, C, C++, and Python
+title: Parallelize your code
 teaching: 0
 exercises: 0
 questions:
-- "Why and when would you need to interface with other programming language?"
+- "What python package could I use to parallelize my Python code?"
+- "What is Data parallelism?"
 ---
 
 # HPC Carpentry
