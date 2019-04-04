@@ -68,7 +68,6 @@ We can use a similar approach to generate `mp4` movies.
 ~~~
 import matplotlib.animation as animation
 
-mpl.rcParams['figure.figsize'] = [20., 10.]
 def drawmap(ax, data, title):
     data.z.plot.pcolormesh(add_colorbar=False,
                    transform=ccrs.PlateCarree())
@@ -89,15 +88,13 @@ writer = FFMpegWriter(fps=20, metadata=metadata)
 
 # Create the figure
 
-fig = plt.figure(figsize=[12,15])  # a new figure window
+fig = plt.figure(figsize=[20,10])  # a new figure window
 ax = fig.add_subplot(1, 1, 1)  # specify (nrows, ncols, axnum)
 ax = plt.axes(projection=ccrs.PlateCarree(central_longitude=180))
-# Create the first plot (filename=0)
-myanimate(0,ax,filenames)
     
 ani = animation.FuncAnimation(fig, myanimate, frames=np.arange(21), 
     fargs=(ax, filenames), interval=100)
-ani.save("grace_movie.mp4") #, codec='rawvideo')
+ani.save("grace_movie.mp4"))
 ~~~
 {: .language-python}
 
@@ -110,18 +107,62 @@ Let’s continue our previous example, and add the following:
 
 ~~~
 from IPython.display import HTML
-import matplotlib as mpl
-
+import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
+import numpy as np
 mpl.rcParams["animation.embed_limit"]=100
+
+import matplotlib.animation as animation
+
+import glob
+def getint(name):
+    _, num = name.split('P_')
+    num, _ = num.split('.')
+    return int(num)
+
+filenames = glob.glob("data/Grace/grd_files_to_interp/GypsumP_*.grd")
+
+filenames = sorted(filenames, key=getint)
+
+def drawmap(ax, data, title):
+    data.z.plot.pcolormesh(add_colorbar=False,
+                   transform=ccrs.PlateCarree())
+    ax.set_title(data.title)
+    ax.coastlines()
+    ax.gridlines()
+    
+def myanimate(i, ax, filenames):
+    ax.clear()
+    dset = xr.open_dataset(filenames[i])
+    new_contour = drawmap(ax, dset, 'data %03d'%(i) ) 
+    dset.close()
+
+FFMpegWriter = animation.writers['ffmpeg']
+metadata = dict(title='Grace data', artist='CEED workshop',
+                comment='Movie for sequence of images')
+writer = FFMpegWriter(fps=20, metadata=metadata)
+
+# Create the figure
+fig = plt.figure(figsize=[20,10])  # a new figure window
+ax = fig.add_subplot(1, 1, 1)  # specify (nrows, ncols, axnum)
+ax = plt.axes(projection=ccrs.PlateCarree(central_longitude=180))
+
+ani = animation.FuncAnimation(fig, myanimate, frames=np.arange(21), 
+    fargs=(ax, filenames), interval=100)
 
 HTML(ani.to_html5_video())
 ~~~
 {: .language-python}
 
-
 <video src="../fig/xarray_movie.mp4" poster="../fig/xarray_4_1.png" width="500" controls="" preload=""></video>
 
 
+or generate HTML representation of the animation:
+
+~~~
+HTML(ani.to_jshtml())
+~~~
+{: .language-python}
 
 # Create an interactive map with folium
 
