@@ -17,6 +17,111 @@ questions:
 
 - [Interactive plot](https://annefou.github.io/jupyter_dashboards/)
 
+## Add interactive button to select image
+
+You can allow users to select themselves which plots to show:
+
+~~~
+import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib import colors as c
+%matplotlib inline
+from mpl_toolkits.basemap import Basemap, shiftgrid
+import numpy as np
+import netCDF4
+from ipywidgets import interact
+
+mpl.rcParams['figure.figsize'] = [20., 10.]
+def drawmap(data, title):
+    ax = plt.axes(projection=ccrs.PlateCarree(central_longitude=180))
+    data.z.plot.pcolormesh(
+                   transform=ccrs.PlateCarree())
+    ax.set_title(data.title)
+    ax.coastlines()
+    ax.gridlines()
+    
+def myanimate(i, filenames):
+    dset = xr.open_dataset(filenames[i])
+    new_contour = drawmap(dset, 'data %03d'%(i) ) 
+    dset.close()
+   
+
+@interact(depth=(0,20))
+def finteract(depth):
+     ca = myanimate(depth, filenames)
+~~~
+{: .language-python}
+
+
+We used `@interact` function to automatically creates user interface (UI) for selecting the data frame.
+When you pass this function as the first argument to interact along with a keyword argument 
+(here depth=(0,20)), a slider is generated and bound to the function parameter (depth).
+
+The name of the function `finteract` is chosen by you and can be anything.
+
+More information and examples [here](https://ipywidgets.readthedocs.io/en/stable/examples/Using%20Interact.html).
+
+## Create a mp4 movie
+
+We can use a similar approach to generate `mp4` movies. 
+
+~~~
+import matplotlib.animation as animation
+
+mpl.rcParams['figure.figsize'] = [20., 10.]
+def drawmap(ax, data, title):
+    data.z.plot.pcolormesh(add_colorbar=False,
+                   transform=ccrs.PlateCarree())
+    ax.set_title(data.title)
+    ax.coastlines()
+    ax.gridlines()
+    
+def myanimate(i, ax, filenames):
+    ax.clear()
+    dset = xr.open_dataset(filenames[i])
+    new_contour = drawmap(ax, dset, 'data %03d'%(i) ) 
+    dset.close()
+
+FFMpegWriter = animation.writers['ffmpeg']
+metadata = dict(title='Grace data', artist='CEED workshop',
+                comment='Movie for sequence of images')
+writer = FFMpegWriter(fps=20, metadata=metadata)
+
+# Create the figure
+
+fig = plt.figure(figsize=[12,15])  # a new figure window
+ax = fig.add_subplot(1, 1, 1)  # specify (nrows, ncols, axnum)
+ax = plt.axes(projection=ccrs.PlateCarree(central_longitude=180))
+# Create the first plot (filename=0)
+myanimate(0,ax,filenames)
+    
+ani = animation.FuncAnimation(fig, myanimate, frames=np.arange(21), 
+    fargs=(ax, filenames), interval=100)
+ani.save("grace_movie.mp4") #, codec='rawvideo')
+~~~
+{: .language-python}
+
+### Embedded animations within your jupyter notebook
+
+The main goal here is to create animations embedded within your jupyter notebook. 
+This is fairly simple to plot your animation within your jupyter notebook.
+
+Let’s continue our previous example, and add the following:
+
+~~~
+from IPython.display import HTML
+import matplotlib as mpl
+
+mpl.rcParams["animation.embed_limit"]=100
+
+HTML(ani.to_html5_video())
+~~~
+{: .language-python}
+
+
+<video src="../fig/xarray_movie.mp4" poster="../fig/xarray_4_1.png" width="500" controls="" preload=""></video>
+
+
 
 # Create an interactive map with folium
 
