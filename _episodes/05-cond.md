@@ -19,8 +19,8 @@ keypoints:
 - "`True` and `False` represent truth values."
 ---
 
-In our last lesson, we discovered something suspicious was going on
-in our inflammation data by drawing some plots.
+In our last lesson, we analyzed multiple files and showed temperature anomalies over several geographical
+areas. However, it was not easy to customize our plots and for instance label the various areas accordingly.
 How can we use Python to automatically recognize the different features we saw,
 and take a different action for each? In this lesson, we'll learn how to write code that
 runs only when certain conditions are true.
@@ -135,93 +135,152 @@ at least one test is true
 
 ## Checking our Data
 
-Now that we've seen how conditionals work,
-we can use them to check for the suspicious features we saw in our inflammation data.
-We are about to use functions provided by the `numpy` module again.
-Therefore, if you're working in a new Python session, make sure to load the
-module with:
+Let's go back to our temperature anomaly datasets and plot the monthly average, min and max for the entire period 
+i.e. December 1978 to February 2019.
 
 ~~~
+filenames = sorted(glob.glob('../data/uahncdc.lt-*.csv'))
+composite_data = numpy.zeros((120,27))
+
+for f in filenames:
+    data = numpy.loadtxt(fname = f,  skiprows=1, delimiter=',')
+    composite_data += data
+
+composite_data/=len(filenames)
+
+fig = matplotlib.pyplot.figure(figsize=(10.0, 3.0))
+
+axes = fig.add_subplot(1, 1, 1)
+
+axes.set_ylabel('average')
+axes.plot(numpy.mean(composite_data, axis=0))
+
+fig.tight_layout()
+
+matplotlib.pyplot.show()
+~~~
+{: .language-python}
+
+~~~
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+<ipython-input-4-e9f9fa30176a> in <module>
+      6 for f in filenames:
+      7     data = numpy.loadtxt(fname = f,  skiprows=1, delimiter=',')
+----> 8     composite_data += data
+      9 
+     10 composite_data/=len(filenames)
+
+ValueError: operands could not be broadcast together with shapes (120,27) (13,27) (120,27) 
+~~~
+{: .output}
+
+We get an error because the first file does not contain 10 years of data but starts from december 1978 to december 1979
+(13 rows instead of 120 rows).
+
+Now that we've seen how conditionals work, we can add a `if` statement to skip the first filename:
+
+
+-  'uahncdc.lt-01.csv' contains less observations than all the other files and the reason is that it starts from
+    december 1978 to december 1979
+- 'uahncdc.lt-05.csv' 
+
+
+~~~
+import glob
 import numpy
+import matplotlib.pyplot
+%matplotlib inline
+
+filenames = sorted(glob.glob('data/uahncdc.lt-*.csv'))
+composite_data = numpy.zeros((120,27))
+
+nfiles = 0
+for f in filenames:
+    data = numpy.loadtxt(fname = f,  skiprows=1, delimiter=',')
+    if data.shape == composite_data.shape:
+        composite_data += data
+        nfiles = nfiles + 1
+
+composite_data/=nfiles
+
+fig = matplotlib.pyplot.figure(figsize=(10.0, 3.0))
+
+axes = fig.add_subplot(1, 1, 1)
+
+axes.set_ylabel('average')
+axes.plot(numpy.mean(composite_data, axis=0))
+
+fig.tight_layout()
+
+matplotlib.pyplot.show()
 ~~~
 {: .language-python}
 
-From the first couple of plots, we saw that maximum daily inflammation exhibits
-a strange behavior and raises one unit a day.
-Wouldn't it be a good idea to detect such behavior and report it as suspicious?
-Let's do that!
-However, instead of checking every single day of the study, let's merely check
-if maximum inflammation in the beginning (day 0) and in the middle (day 20) of
-the study are equal to the corresponding day numbers.
+![png](../fig/05-conf_if.png)
 
-~~~
-max_inflammation_0 = numpy.max(data, axis=0)[0]
-max_inflammation_20 = numpy.max(data, axis=0)[20]
-
-if max_inflammation_0 == 0 and max_inflammation_20 == 20:
-    print('Suspicious looking maxima!')
-~~~
-{: .language-python}
-
-We also saw a different problem in the third dataset;
-the minima per day were all zero (looks like a healthy person snuck into our study).
-We can also check for this with an `elif` condition:
-
-~~~
-elif numpy.sum(numpy.min(data, axis=0)) == 0:
-    print('Minima add up to zero!')
-~~~
-{: .language-python}
-
-And if neither of these conditions are true, we can use `else` to give the all-clear:
+We can also print a warning if a file is skipped with an `else` condition:
 
 ~~~
 else:
-    print('Seems OK!')
+	print("Warning: file " , f , "skipped")
 ~~~
 {: .language-python}
+
+We could also use `elif` to test another condition:
+~~~
+    elif data.shape[0] > composite_data.shape[0]:
+        print("Warning: file " , f , " has too many rows so we skip it")
+    else:
+        print("Warning: file " , f , "has not enough rows so we skip it")
+~~~
+{: .language-python}
+
+So we check if the file has more or less rows than expected.
 
 Let's test that out:
 
 ~~~
-data = numpy.loadtxt(fname='inflammation-01.csv', delimiter=',')
+import glob
+import numpy
+import matplotlib.pyplot
+%matplotlib inline
 
-max_inflammation_0 = numpy.max(data, axis=0)[0]
-max_inflammation_20 = numpy.max(data, axis=0)[20]
+filenames = sorted(glob.glob('data/uahncdc.lt-*.csv'))
+composite_data = numpy.zeros((120,27))
 
-if max_inflammation_0 == 0 and max_inflammation_20 == 20:
-    print('Suspicious looking maxima!')
-elif numpy.sum(numpy.min(data, axis=0)) == 0:
-    print('Minima add up to zero!')
-else:
-    print('Seems OK!')
+nfiles = 0
+for f in filenames:
+    data = numpy.loadtxt(fname = f,  skiprows=1, delimiter=',')
+    if data.shape == composite_data.shape:
+        composite_data += data
+        nfiles = nfiles + 1
+    elif data.shape[0] > composite_data.shape[0]:
+        print("Warning: file " , f , " has too many rows so we skip it")
+    else:
+        print("Warning: file " , f , "has not enough rows so we skip it")
+
+composite_data/=nfiles
+
+fig = matplotlib.pyplot.figure(figsize=(10.0, 3.0))
+
+axes = fig.add_subplot(1, 1, 1)
+
+axes.set_ylabel('average')
+axes.plot(numpy.mean(composite_data, axis=0))
+
+fig.tight_layout()
+
+matplotlib.pyplot.show()
 ~~~
 {: .language-python}
 
 ~~~
-Suspicious looking maxima!
+Warning: file  data/uahncdc.lt-01.csv has not enough rows so we skip it
+Warning: file  data/uahncdc.lt-05.csv has not enough rows so we skip it
 ~~~
 {: .output}
 
-~~~
-data = numpy.loadtxt(fname='inflammation-03.csv', delimiter=',')
-
-max_inflammation_0 = numpy.max(data, axis=0)[0]
-max_inflammation_20 = numpy.max(data, axis=0)[20]
-
-if max_inflammation_0 == 0 and max_inflammation_20 == 20:
-    print('Suspicious looking maxima!')
-elif numpy.sum(numpy.min(data, axis=0)) == 0:
-    print('Minima add up to zero!')
-else:
-    print('Seems OK!')
-~~~
-{: .language-python}
-
-~~~
-Minima add up to zero!
-~~~
-{: .output}
 
 In this way,
 we have asked Python to do something different depending on the condition of our data.
