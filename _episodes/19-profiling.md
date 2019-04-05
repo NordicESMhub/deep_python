@@ -1,5 +1,5 @@
 ---
-title: Improve the performance of your code
+title: Check and improve the performance of your code
 teaching: 0
 exercises: 0
 questions:
