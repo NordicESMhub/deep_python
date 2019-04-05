@@ -2662,4 +2662,44 @@ fig.tight_layout()
 
 ![png](../fig/output_85_0.png)
 
+# Numpy arrays to pandas dataframe
+
+## Write to csv file
+
+~~~
+import pathlib
+import glob
+import pandas as pd
+import numpy as np
+import os
+
+
+path = '/opt/uio/deep_python/data/Nina/' #directory to the file we would like to import
+filenames = glob.glob(path + "Inline_*.dat")
+
+for file in filenames:
+    print(file)
+    data = np.loadtxt(file, dtype='str')
+    frame=pd.DataFrame(data)
+    frame[1].astype('float', inplace=True)
+    frame[2].astype('float', inplace=True)
+    frame[3] = frame[3].astype('float', inplace=True)+0.000001
+    
+    newfile = os.path.dirname(file) + '/' + pathlib.Path(file).stem + '_cal.dat'
+    frame.to_csv(newfile, header=None, sep=' ', float_format="%.6f",  index=False)
+   
+~~~
+{: .language-python}
+
+~~~
+/opt/uio/deep_python/data/Nina/Inline_3704.dat
+/opt/uio/deep_python/data/Nina/Inline_3705.dat
+/opt/uio/deep_python/data/Nina/Inline_3703.dat
+/opt/uio/deep_python/data/Nina/Inline_3702.dat
+/opt/uio/deep_python/data/Nina/Inline_3701.dat
+~~~
+{: .output}
+
+
+
 {% include links.md %}
