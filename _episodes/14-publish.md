@@ -13,6 +13,44 @@ questions:
 - [Working with Spatio-temporal data](https://annefou.github.io/metos_python/)
 - [Python for Atmosphere and Ocean Scientists](https://carpentrieslab.github.io/python-aos-lesson/)
 
+## Hexbin map example
+
+~~~
+import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
+from mpl_toolkits.basemap import Basemap
+%matplotlib inline
+import matplotlib.colors as colors
+from numpy import array
+from numpy import max
+import numpy as np
+
+plt.figure()
+filename = "data/Justin/icepmag_20190118.csv"
+frame = pd.read_csv(filename)
+
+frame.head()
+# replace -9999 by NaN (missing values)
+frame.replace(-9999.0,np.NaN, inplace=True)
+# remove rows where lon or lat are missing
+frame.dropna(subset=['lon', 'lat'], inplace=True)
+# drop duplicates
+latlons = frame[['lat', 'lon']].drop_duplicates()
+
+map = Basemap(llcrnrlon=335,llcrnrlat=63.0,urcrnrlon=348.,urcrnrlat=67.,
+             resolution='i', projection='tmerc', lat_0 = 64.5, lon_0 = 340)
+
+
+x,y = map(latlons['lon'].values,latlons['lat'].values)
+map.hexbin(x,y, gridsize=20, mincnt=1, cmap='summer', norm=colors.LogNorm())
+
+
+map.drawcoastlines()
+plt.show()
+~~~
+{: .language-python}
+
+
 # Interactive plot in the Jupyter notebooks
 
 - [Interactive plot](https://annefou.github.io/jupyter_dashboards/)
