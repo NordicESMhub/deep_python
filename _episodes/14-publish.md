@@ -876,8 +876,12 @@ img[:,:,:] = newarray.where((newarray.z<=-0.5) | (newarray.z >= 0.5))['z'][:,:]
 - 3D plots of anomalies (z)
 
 ~~~
+bounds = np.array(
+        [-180, 180, -90, 90, 1, 110]
+    ).astype("int")
+	
 import k3d
-volume = k3d.volume(img[0:200,::2,::2] , color_range=[-4,4], color_map=np.array(k3d.basic_color_maps.Jet , dtype=np.float64))
+volume = k3d.volume(img[0:200,::2,::2] , height=1200, bounds = bounds, color_range=[-4,4], color_map=np.array(k3d.basic_color_maps.Jet , dtype=np.float64))
 
 plot = k3d.plot(height=700)
 plot += volume
