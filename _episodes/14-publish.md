@@ -881,9 +881,11 @@ bounds = np.array(
     ).astype("int")
 	
 import k3d
-volume = k3d.volume(img[0:200,::2,::2] , height=1200, bounds = bounds, color_range=[-4,4], color_map=np.array(k3d.basic_color_maps.Jet , dtype=np.float64))
+volume = k3d.volume(img[0:200,::,::] , 
+                    compression_level=9,height=1200, bounds = bounds, 
+					color_range=[-4,4], color_map=np.array(k3d.basic_color_maps.Jet , dtype=np.float64))
 
-plot = k3d.plot(height=700)
+plot = k3d.plot(height=1200)
 plot += volume
 plot.display()
 ~~~
