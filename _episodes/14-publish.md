@@ -897,14 +897,14 @@ plot.display()
 
 # Interactive plots with Plotly
 
-
+## 2D plots
 
 ```python
 import pandas as pd
 import numpy as np
 ```
 
-## Read input data
+### Read input data
 
 
 ```python
@@ -995,7 +995,7 @@ frame.head()
 
 
 
-## Use plotly offline to be able to save and use your plots offline
+### Use plotly offline to be able to save and use your plots offline
 
 
 ```python
@@ -1003,14 +1003,14 @@ import plotly.offline as py
 import plotly.graph_objs as go
 ```
 
-## To initialize plotly for notebook usage
+### To initialize plotly for notebook usage
 
 
 ```python
 py.init_notebook_mode()
 ```
 
-## Simple scatter plot with plotly
+### Simple scatter plot with plotly
 
 
 ```python
@@ -1019,7 +1019,7 @@ py.iplot(data_to_plot)
 ```
 
 
-## Add title and x-axis and y-axis labels
+### Add title and x-axis and y-axis labels
 
 
 ```python
@@ -1045,7 +1045,7 @@ fig = go.Figure(data=data_to_plot, layout=layout)
 py.iplot(fig)
 ```
 
-## Save your interactive plot in HTML file
+### Save your interactive plot in HTML file
 
 ~~~
 py.plot(fig, filename = 'plotly_example.html', auto_open=False)
@@ -1054,6 +1054,293 @@ py.plot(fig, filename = 'plotly_example.html', auto_open=False)
 
 <iframe width="1000" height="400" src="../files/plotly_example.html" frameborder="0" allowfullscreen></iframe>
 
+## 3D plots: 3D interactive map on a sphere using plotly
+
+**References**:  
+    - from a notebook by the Plotly user @Dreamshot, [https://plot.ly/~Dreamshot/9152](https://plot.ly/~Dreamshot/9152).
+    - from notebook by Plotly user @empet, [Heatmap plot on a spherical map](https://plot.ly/~empet/14813/heatmap-plot-on-a-spherical-map/#/)
+
+# Import python packages
+
+
+```python
+import os
+os.environ['PROJ_LIB']= "/opt/tljh/user/share/proj"
+import plotly.offline as py
+import cartopy as ccrs
+import numpy as np
+import xarray as xr
+import numpy as np
+import matplotlib as mpl
+mpl.use('Agg')
+from mpl_toolkits.basemap import Basemap
+# For plotly
+py.init_notebook_mode()
+```
+# Define utility functions
+
+
+```python
+# convert degrees to radians
+def degree2radians(degree):
+    #convert degrees to radians
+    return degree*np.pi/180.
+```
+
+
+```python
+# get depth from filename
+def getint(name):
+    _, num = name.split('P_')
+    num, _ = num.split('.')
+    return int(num)
+```
+
+
+```python
+# maps the points of coords (lon, lat) to points onto the  sphere of radius radius
+def mapping_map_to_sphere(lon, lat, radius=1):
+    lon=np.array(lon, dtype=np.float64)
+    lat=np.array(lat, dtype=np.float64)
+    lon=degree2radians(lon)
+    lat=degree2radians(lat)
+    xs=radius*np.cos(lon)*np.cos(lat)
+    ys=radius*np.sin(lon)*np.cos(lat)
+    zs=radius*np.sin(lat)
+    return xs, ys, zs
+```
+
+
+```python
+# Functions converting coastline/country polygons to lon/lat traces
+def polygons_to_traces(poly_paths, N_poly, m):
+    ''' 
+    pos arg 1. (poly_paths): paths to polygons
+    pos arg 2. (N_poly): number of polygon to convert
+    '''
+    # init. plotting list
+    lons=[]
+    lats=[]
+
+    for i_poly in range(N_poly):
+        poly_path = poly_paths[i_poly]
+        
+        # get the Basemap coordinates of each segment
+        coords_cc = np.array(
+            [(vertex[0],vertex[1]) 
+             for (vertex,code) in poly_path.iter_segments(simplify=False)]
+        )
+        
+        # convert coordinates to lon/lat by 'inverting' the Basemap projection
+        lon_cc, lat_cc = m(coords_cc[:,0],coords_cc[:,1], inverse=True)
+    
+        
+        lats.extend(lat_cc.tolist()+[None]) 
+        lons.extend(lon_cc.tolist()+[None])
+        
+       
+    return lons, lats
+```
+
+
+```python
+# Function generating coastline lon/lat 
+def get_coastline_traces(m):
+    poly_paths = m.drawcoastlines().get_paths() # coastline polygon paths
+    N_poly = 91  # use only the 91st biggest coastlines (i.e. no rivers)
+    cc_lons, cc_lats= polygons_to_traces(poly_paths, N_poly, m)
+    return cc_lons, cc_lats
+```
+
+
+```python
+# Function generating country lon/lat 
+def get_country_traces(m):
+    poly_paths = m.drawcountries().get_paths() # country polygon paths
+    N_poly = len(poly_paths)  # use all countries
+    country_lons, country_lats= polygons_to_traces(poly_paths, N_poly, m)
+    return country_lons, country_lats
+```
+
+# Get depth from filename
+
+
+```python
+filename = "/opt/uio/deep_python/data/Grace/grd_files_to_interp/GypsumP_100.grd"
+```
+
+
+```python
+depth = getint(filename)
+```
+
+# Dataset
+
+- open dataset
+- get lat, lon and z values as numpy arrays
+
+
+```python
+df = xr.open_dataset(filename)
+df
+```
+
+
+
+~~~
+    <xarray.Dataset>
+    Dimensions:  (lat: 165, lon: 328)
+    Coordinates:
+      * lon      (lon) float64 -180.0 -178.9 -177.8 -176.7 ... 177.8 178.9 180.0
+      * lat      (lat) float64 -90.0 -88.9 -87.8 -86.71 ... 86.71 87.8 88.9 90.0
+    Data variables:
+        z        (lat, lon) float32 ...
+    Attributes:
+        Conventions:  COARDS/CF-1.0
+        title:        GypsumP_100.grd
+        history:      xyz2grd -V -Rd -I1.1 GypsumP_175.txt -GGypsumP_100.grd
+        GMT_version:  4.5.5 [64-bit]
+~~~
+{: .output}
+
+
+
+```python
+lon=df.lon.values
+lat=df.lat.values
+z=df.z.values
+# min and max values (used for plotting)
+vmin=z.min()
+vmax=z.max()
+```
+
+# Generate 3D map on a sphere with Plotly
+
+
+```python
+# Make shortcut to Basemap object, 
+# not specifying projection type for this example
+map = Basemap() 
+```
+
+# Get list of of coastline, country, and state lon/lat 
+
+
+```python
+cc_lons, cc_lats=get_coastline_traces(map)
+country_lons, country_lats=get_country_traces(map)
+
+#concatenate the lon/lat for coastlines and country boundaries:
+lons=cc_lons+[None]+country_lons
+lats=cc_lats+[None]+country_lats
+
+xs, ys, zs=mapping_map_to_sphere(lons, lats, radius=1.01)# here the radius is slightly greater than 1 
+                                                         #to ensure lines visibility; otherwise (with radius=1)
+                                                         # some lines are hidden by contours colors
+        
+boundaries=dict(type='scatter3d',
+               x=xs,
+               y=ys,
+               z=zs,
+               mode='lines',
+               line=dict(color='black', width=1)
+                )
+```
+
+
+```python
+# Take lat, lon from field
+clons=np.array(lon.tolist()+[180], dtype=np.float64)
+clats=np.array(lat, dtype=np.float64)
+# Create a meshgrid from lats and lons
+clons, clats=np.meshgrid(clons, clats)
+
+# Project our (lat,lon,z) to our sphere
+XS, YS, ZS=mapping_map_to_sphere(clons, clats)
+
+# generate values for the field Z
+# Wrap over longitudes
+nrows, ncolumns=clons.shape
+VALUES=np.zeros(clons.shape, dtype=np.float64)
+VALUES[:, :ncolumns-1]=np.copy(np.array(z,  dtype=np.float64))
+VALUES[:, ncolumns-1]=np.copy(z[:, 0])
+
+# Create a sphere: colors are taken from our field Z that was mapped to our sphere(VALUES)
+sphere=dict(type='surface',
+            x=XS, 
+            y=YS, 
+            z=ZS,
+            colorscale='Jet',
+            surfacecolor=VALUES,
+            cmin=vmin, 
+            cmax=vmax,
+            colorbar=dict(thickness=20, len=0.75, ticklen=4, title= 'Z'),
+            hoverinfo='text')
+
+```
+
+# Make Pyplot figure
+
+
+```python
+# Turn off all axis
+noaxis=dict(showbackground=False,
+            showgrid=False,
+            showline=False,
+            showticklabels=False,
+            ticks='',
+            title='',
+            zeroline=False)
+
+# Define layout i.e. title, figure size, axis (x, y, z), camera, etc.
+layout3d=dict(title='Z<br>Depth '+ str(getint(filename)) + 'm',
+              font=dict(family='Balto', size=14),
+              width=700, 
+              height=700,
+              scene=dict(xaxis=noaxis, 
+                         yaxis=noaxis, 
+                         zaxis=noaxis,
+                         aspectratio=dict(x=1,
+                                          y=1,
+                                          z=1),
+                         camera=dict(eye=dict(x=1.15, 
+                                     y=1.15, 
+                                     z=1.15)
+                                    )
+            ),
+            paper_bgcolor='rgba(255,255,255, 1.0)'  
+           )
+
+fig=dict(data=[sphere, boundaries], layout=layout3d)
+py.iplot(fig, filename='z-map2sphere')
+```
+
+<iframe width="1000" height="1000" src="../files/plotly_sphere3D.html" frameborder="0" allowfullscreen></iframe>
+
+# Globe with ipyvolume
+
+
+```python
+import ipyvolume as ipv
+
+Z = df.z.values.astype('float64')
+from matplotlib import cm
+colormap = cm.jet
+
+znorm = VALUES - VALUES.min()
+znorm /= znorm.ptp()
+znorm.min(), znorm.max()
+color = colormap(znorm)
+ipv.figure()
+mesh = ipv.plot_surface(XS, YS, ZS, color=color[...,:3])
+countries = ipv.pylab.plot(xs,ys,zs, color='black')
+ipv.pylab.style.box_off()
+ipv.pylab.style.axes_off()
+ipv.show()
+ipv.pylab.save("ipyvolume_sphere3D.html")
+```
+
+<iframe width="1000" height="1000" src="../files/ipyvolume_sphere3D.html" frameborder="0" allowfullscreen></iframe>
 
 
 # Publish your notebook (mybinder)
