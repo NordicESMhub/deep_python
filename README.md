@@ -24,3 +24,11 @@ A list of contributors to the lesson can be found in [AUTHORS](AUTHORS)
 To cite this lesson, please consult with [CITATION](CITATION)
 
 [lesson-example]: https://carpentries.github.io/lesson-example
+
+## Workshops
+
+- Workshop given for [DEEP Norwegian Research School for Dynamics and Evolution of Earth and Planets](https://www.mn.uio.no/ceed/english/research/doctoral-degree/national-phd-school/)
+
+  - **When**: 1st to 5th April 2019 
+  - **Instructors**: Nils Charles Prieur and Anne Fouilloux
+  - **Workshop website**: [https://annefou.github.io/2019-04-01-deep/](https://annefou.github.io/2019-04-01-deep/)
